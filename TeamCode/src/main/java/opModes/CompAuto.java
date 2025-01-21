@@ -53,7 +53,7 @@ public class CompAuto extends OpMode {
         telemetry.addData("y", auto.follower.getPose().getY());
         telemetry.addData("heading", auto.follower.getPose().getHeading());
         telemetry.update();
-    }
+    }//
 
     /** We do not use this because everything should automatically disable **/
     @Override
