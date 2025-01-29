@@ -16,10 +16,11 @@ public class CompAuto extends OpMode {
     public Auto auto;
     private Timer pathTimer, actionTimer, opmodeTimer;
 
+    private boolean blockSensed = false;
+
     private int pathState;
     private double fastSpeed = 1;
     private double slowSpeed = .5;
-    //private boolean toggle = false;
 
     @Override
     public void init() {
@@ -47,6 +48,19 @@ public class CompAuto extends OpMode {
         auto.update();
         autonomousPathUpdate();
 
+//        if (auto.intakeTouchState()) {
+//            if(pathState == 3) {
+//                auto.follower.breakFollowing();
+//                setPathState(4);
+//            } else if (pathState == 6) {
+//                auto.follower.breakFollowing();
+//                setPathState(7);
+//            } else if (pathState == 9) {
+//                auto.follower.breakFollowing();
+//                setPathState(10);
+//            }
+//        }
+
         // Feedback to Driver Hub
         telemetry.addData("path state", pathState);
         telemetry.addData("x", auto.follower.getPose().getX());
@@ -63,9 +77,10 @@ public class CompAuto extends OpMode {
 
     public void autonomousPathUpdate() {
         switch (pathState) {
+
             case 0:  // MOVE TO SCORE PRELOAD.  RAISE LIFT AND PREP BUCKET.
                 auto.liftPIDF = true;
-//                toggle = false;
+                blockSensed = false;
                 auto.follower.setMaxPower(fastSpeed);
                 auto.startPreScore();
                 auto.follower.followPath(auto.scorePreload, true);
@@ -74,8 +89,8 @@ public class CompAuto extends OpMode {
 
             case 1:  // DUMP PRELOAD INTO BASKET
                 if(!auto.follower.isBusy() && auto.actionNotBusy()) {
-                auto.startDump();
-                setPathState(2);}
+                    auto.startDump();
+                    setPathState(2);}
                 break;
 
             case 2: // MOVE TO FIRST SAMPLE.  LOWER LIFT, SET BUCKET, AND REACH INTAKE
@@ -87,24 +102,27 @@ public class CompAuto extends OpMode {
                     setPathState(3);
                 }
                 break;
+
             case 3: // MOVE INTO THE FIRST SAMPLE AND GRAB IT
                 if(!auto.follower.isBusy() && auto.actionNotBusy()) {
                     auto.follower.setMaxPower(slowSpeed);
                     auto.follower.followPath(auto.grabPickup1, true);
-                        setPathState(4);
                 }
-//                if(auto.getIntakeTouchToggle() || toggle) {
-//                    toggle = true;
-//                    auto.follower.breakFollowing();
-//                    auto.setActionBusy(false);
-//                    setPathState(4);
-//                }
+                break;
+
+            case 50:
+                if(!auto.follower.isBusy() && auto.actionNotBusy()) {
+                    auto.follower.setMaxPower(slowSpeed);
+                    auto.follower.followPath(auto.farPickup1, true);
+                    setPathState(4);
+                }
                 break;
 
             case 4: // MOVE TO THE BASKET TO PREPARE TO SCORE FIRST SAMPLE
                 if(!auto.follower.isBusy() && auto.actionNotBusy()) {
                     auto.follower.setMaxPower(fastSpeed);
                     auto.startTransfer();
+                    blockSensed = false;
                     auto.follower.followPath(auto.scorePickup1,true);
                     setPathState(90);
                 }
@@ -113,8 +131,6 @@ public class CompAuto extends OpMode {
             case 90: // DUMP FIRST SAMPLE BUCKET
                 if(!auto.follower.isBusy() && auto.actionNotBusy()) {
                     auto.startDump();
-                    //toggle = false;
-
                     setPathState(5);}
                 break;
 
@@ -126,19 +142,23 @@ public class CompAuto extends OpMode {
                     setPathState(6);
                 }
                 break;
+
             case 6: // MOVE INTO THE SECOND SAMPLE AND GRAB IT.
                 if(!auto.follower.isBusy() && auto.actionNotBusy()) {
                     auto.follower.setMaxPower(slowSpeed);
                     auto.follower.followPath(auto.grabPickup2,true);
-                    setPathState(7);
+                    setPathState(51);
                 }
-//                if(auto.getIntakeTouchToggle() || toggle){
-//                    toggle = true;
-//                    auto.follower.breakFollowing();
-//                    auto.setActionBusy(false);
-//                    setPathState(7);
-//                }
                 break;
+
+            case 51:
+                if(!auto.follower.isBusy() && auto.actionNotBusy()) {
+                    auto.follower.setMaxPower(slowSpeed);
+                    auto.follower.followPath(auto.farPickup2, true);
+                    setPathState(4);
+                }
+                break;
+
             case 7: // MOVE TO DEPOSIT IT.
                 if(!auto.follower.isBusy() && auto.actionNotBusy()) {
                     auto.follower.setMaxPower(fastSpeed);
@@ -151,35 +171,31 @@ public class CompAuto extends OpMode {
             case 91: // DUMP BUCKET
                 if(!auto.follower.isBusy() && auto.actionNotBusy()) {
                     auto.startDump();
-                    //toggle = false;
                     setPathState(8);
                 }
                 break;
+
             case 8: //MOVE TO SAMPLE 3
-               if(!auto.follower.isBusy() && auto.actionNotBusy()) {
-                    //auto.setIntakeTouchToggle(false);
+                if(!auto.follower.isBusy() && auto.actionNotBusy()) {
                     auto.startPostScore();
                     auto.follower.followPath(auto.prePickup3,true);
                     setPathState(9);
                 }
                 break;
+
             case 9: //MOVE INTO SAMPLE 3
                 if(!auto.follower.isBusy() && auto.actionNotBusy()) {
                     auto.follower.setMaxPower(slowSpeed);
                     auto.follower.followPath(auto.grabPickup3,true);
                     setPathState(10);
+
                 }
-//                if(auto.getIntakeTouchToggle() || toggle){
-//                    toggle = true;
-//                    auto.follower.breakFollowing();
-//                    auto.setActionBusy(false);
-//                    setPathState(10);
-//                }
                 break;
 
             case 10: // MOVE TO SCORE POSITION
                 if(!auto.follower.isBusy() && auto.actionNotBusy()) {
                     auto.startTransfer();
+                    blockSensed = false;
                     auto.follower.setMaxPower(fastSpeed);
                     auto.follower.followPath(auto.scorePickup3,true);
                     setPathState(92);
@@ -201,6 +217,7 @@ public class CompAuto extends OpMode {
                     setPathState(12);
                 }
                 break;
+
             case 12: // CLOSE OUT AUTO
                 if(!auto.follower.isBusy() && auto.actionNotBusy()) {
                     setPathState(-1);

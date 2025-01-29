@@ -29,6 +29,7 @@ public class LinkageSubsystem {
     public Servo leftExtend, rightExtend;
     private double lPos = 0;
     public double extendLimit = LLinkageMax;
+    public double retractLimit = LLinkageIn;
     public RunAction toIn, toMid, toFull;
 
     public LinkageSubsystem(HardwareMap hardwareMap, LinkageState linkageState, Telemetry telemetry) {
@@ -54,11 +55,11 @@ public class LinkageSubsystem {
             leftPos += (LinkageManualIncrements * direction);
             rightPos += (LinkageManualIncrements * direction);
         } else {
-            leftPos = rightExtend.getPosition();
+            leftPos = leftExtend.getPosition();
             rightPos = rightExtend.getPosition();
         }
 
-        leftExtend.setPosition(rightPos);
+        leftExtend.setPosition(leftPos);
         rightExtend.setPosition(rightPos);
     }
 

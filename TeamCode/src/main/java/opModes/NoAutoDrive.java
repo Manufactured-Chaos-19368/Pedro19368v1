@@ -17,8 +17,8 @@ import java.util.Locale;
 import util.action.GoBildaPinpointDriver;
 
 //Call the teleop so it shows up on the driver station.
-@TeleOp(name = "Competition Drive", group = "TeleOp")
-public class CompDrive extends LinearOpMode {
+@TeleOp(name = "No Auto Drive", group = "TeleOp")
+public class NoAutoDrive extends LinearOpMode {
     //can have variables and define hardware objects here, anything from here to "waitForStart();" will run in initialization.\
 
     //Actuators
@@ -116,6 +116,7 @@ public class CompDrive extends LinearOpMode {
     public static final double kThreshold = 8;
 
 
+
     public boolean highToggle = true;
 
     //start of opmode, inside this function will be your main while loop and initialize all hardware objects
@@ -165,10 +166,10 @@ public class CompDrive extends LinearOpMode {
 // Value to ensure that the toggle is off
         toggle = -5;
         // The hands in and out rotation
-        //LiftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LiftR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         LiftR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         LiftR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //LiftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LiftL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         LiftL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         LiftL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Rintake.setDirection(CRServo.Direction.REVERSE);
@@ -319,14 +320,17 @@ public class CompDrive extends LinearOpMode {
             }
 
             if (gamepad2.dpad_down && toggle == -5) {
+                //Bail();
                 MoveLinkage(RLinkagePartialPos, LLinkagePartialPos);
                 MoveWrist(RWristPartialPos, LWristPartialPos);
                 toggle = -1;
 
             } else if (gamepad2.dpad_right && toggle == -1) {
+                //Bail();
                 toggle = 0;
 
             } else if (toggle == 0) {
+                //Bail();
                 // rotates the hand down to intake position
                 // add a spot where the wheels only intake if told to.
                 MoveWrist(RWristOutPos-.002 , LWristOutPos-.002 );
@@ -347,23 +351,28 @@ public class CompDrive extends LinearOpMode {
 
                 }
                 if (gamepad2.left_bumper && toggle == 0) {
+                    //Bail();
                     MoveIntake(1);
 
                 } else if (gamepad2.right_bumper && toggle == 0) {
+                    //Bail();
                     MoveIntake(-1);
 
                 } else if (!gamepad2.right_bumper && !gamepad2.left_bumper && toggle == 0) {
+                    //Bail();
                     MoveIntake(0);
                 }
 
                 // returns bucket to a mid point to make sure it goes the correct way around
                 if (Touch.isPressed()) {
+                    //Bail();
                     // checks if we have something intaken
                     toggle = 1;
                 }
 
 //RETURN MECH TO HOME POSITION AND PLACE SAMPLE IN BUCKET
             } else if (toggle == 1) {
+                //Bail();
                 MoveBucket(BucketIntakePos);
                 MoveLift(LiftIntakePos + liftAdjust, .5);
                 MoveWrist(RWristPartialPos, LWristPartialPos);
@@ -378,12 +387,14 @@ public class CompDrive extends LinearOpMode {
 
                 // HAND MECH IS BACK AND WE ARE GOING TURN ON THE INTAKE TO SPIT OUT THE SAMPLE
             } else if (toggle == 2 && getRuntime() >= IntakeTime + .5) {
+                //Bail();
                 MoveIntake(-1);
                 IntakeTime = getRuntime();
                 toggle = 3;
 
 //  AFTER A PAUSE RAISE THE LIFT TO DEPOSIT POSITION
             } else if (toggle == 3 && getRuntime() >= IntakeTime + .65) {
+                //Bail();
 
                 if (highToggle) {
                     MoveLift(LiftDepositPos, liftSpeed);
@@ -396,6 +407,7 @@ public class CompDrive extends LinearOpMode {
 
 //  AFTER A PAUSE  MOVE THE BUCKET AND TURN OFF THE INTAKE
             } else if (toggle == 4 && getRuntime() >= IntakeTime + 0.25) {
+                //Bail();
                 MoveIntake(0);
                 MoveBucket(.35);
                 toggle = 4.5;
@@ -403,12 +415,14 @@ public class CompDrive extends LinearOpMode {
 
 // DPAD LEFT TO DEPOSIT THE SAMPLE
             else if (toggle == 4.5/*5*/ && gamepad2.dpad_left) {
+                //Bail();
                 MoveBucket(BucketScorePos);
                 IntakeTime = getRuntime();
                 toggle = 6;
 
                 // AFTER A PAUSE, MOVE THE BUCKET BACK TO PRESCORE AND LOWER THE LIFT
             } else if (toggle == 6 && getRuntime() >= IntakeTime + 1) {
+               // Bail();
                 MoveBucket(BucketPreScorePos);
                 MoveLift(LiftRestPos + liftAdjust, liftSpeed);
                 down = true;
@@ -465,7 +479,7 @@ public class CompDrive extends LinearOpMode {
                 button_State = true;
             }
 
-//Bail Action
+            //Bail Action
             if (gamepad2.touchpad) {
                 MoveLift(LiftRestPos, liftSpeed);
                 MoveIntake(0);
@@ -490,15 +504,16 @@ public class CompDrive extends LinearOpMode {
     }// end of run opmode loop
 
 //    private void Bail() {
-//        if (gamepad2.touchpad) {
-//            MoveLift(LiftRestPos, liftSpeed);
-//            MoveIntake(0);
-//            MoveWrist(RWristPartialPos, LWristPartialPos);
-//            MoveLinkage(RLinkageInPos, LLinkageInPos);
+//        //if (gamepad2.touchpad) {
+//           // MoveLift(LiftRestPos, liftSpeed);
+//            //MoveIntake(0);
+//            //MoveWrist(RWristPartialPos, LWristPartialPos);
+//
+//            //MoveLinkage(RLinkageInPos, LLinkageInPos);
 //
 //            // toggles value and starts a passive timer
-//            toggle = -5;
-//        }
+//            //toggle = -5;
+//        //}
 //    }
 
     private void MoveLift(int Position, double Speed) {

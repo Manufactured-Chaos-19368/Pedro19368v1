@@ -74,27 +74,31 @@ public class LiftSubsystem {
             rightLift.setPower(power);
             leftLift.setPower(power);
 
-            telemetry.addData("lift pos", getPos());
-            telemetry.addData("lift target", target);
+            //telemetry.addData("lift pos", getPos());
+            //telemetry.addData("lift target", target);
         }
     }
 
     public void manual(double n){
-        manual = true;
+        if(Math.abs(n)>.1) {
+            manual = true;
 
-        rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        rightLift.setPower(n);
-        leftLift.setPower(n);
+            rightLift.setPower(n);
+            leftLift.setPower(n);
 
-        if(liftTouch.isPressed() & n < 0){
+            if (liftTouch.isPressed() & n < 0) {
+                rightLift.setPower(0);
+                leftLift.setPower(0);
+
+                rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
+        } else if(Math.abs(n)>0 && Math.abs(n) < .1){
             rightLift.setPower(0);
             leftLift.setPower(0);
-
-            rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         }
     }
 
@@ -149,7 +153,6 @@ public class LiftSubsystem {
 
     public void toTransfer() {
         manual = false;
-
         setTarget(LiftTransfer);
     }
 

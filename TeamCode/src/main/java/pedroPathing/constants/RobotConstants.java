@@ -8,7 +8,7 @@ public class RobotConstants {
     static public double RLinkagePartial= 0.101; //
     public static double LLinkageMax = 0.495;
     static public double RLinkageMax = 0.272;
-    public static double LinkageManualIncrements = .05;
+    public static double LinkageManualIncrements = .003;
     public static double LinkageMax = LLinkageMax;
     public static double LinkageMin = LLinkageIn;
 
@@ -41,4 +41,8 @@ public class RobotConstants {
     static public final double DRIVE_SPEED_SLOW = .4;
     static public final double DRIVE_SPEED_MEDIUM = 0.60;
     public double driveSpeed = DRIVE_SPEED_FULL;
+
+    //****Auto****\\
+    static public double fastSpeed = 1;
+    static public double slowSpeed = 1;
 }

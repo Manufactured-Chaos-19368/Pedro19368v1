@@ -79,12 +79,6 @@ public class IntakeSubsystem {
         this.spinState = IntakeSpinState.IN;
     }
 
-    public void spinInBackAlways() {
-        Lintake.setPower(intakeSpinInPwr);
-        Rintake.setPower(intakeSpinInPwr);
-        this.spinState = IntakeSpinState.IN;
-    }
-
     public void spinOut() {
         Lintake.setPower(intakeSpinOutPwr);
         Rintake.setPower(intakeSpinOutPwr);
@@ -121,6 +115,10 @@ public class IntakeSubsystem {
         } else if (wristState == WristPivotState.OUT) {
             wristMid();
         }
+    }
+
+    public WristPivotState getWristState() {
+        return wristState;
     }
 
     public void wristIn() {

@@ -48,7 +48,7 @@ public class Auto {
 
     //public Pose startPose, parkControlPose, parkPose;
     public Path scorePreload, park;
-    public PathChain prePickup1, grabPickup1, scorePickup1, prePickup2, grabPickup2, scorePickup2, prePickup3, grabPickup3, scorePickup3;
+    public PathChain prePickup1, grabPickup1, farPickup1, scorePickup1, prePickup2, grabPickup2, farPickup2, scorePickup2, prePickup3, grabPickup3, scorePickup3;
 
     public Auto(HardwareMap hardwareMap, Telemetry telemetry, Follower follower) {
         bucket = new BucketSubsystem(hardwareMap, bucketState, telemetry);
@@ -126,10 +126,15 @@ public class Auto {
                 .setLinearHeadingInterpolation(rightSamplePreIntakePose.getHeading(), rightSampleIntakePose.getHeading())
                 .build();
 
+        farPickup1 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(rightSampleIntakePose), new Point(rightSampleIntakePoseFar)))
+                .setLinearHeadingInterpolation(rightSampleIntakePose.getHeading(), rightSampleIntakePoseFar.getHeading())
+                .build();
+
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(rightSampleIntakePose), new Point(scorePose)))
-                .setLinearHeadingInterpolation(rightSampleIntakePose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(new Point(rightSampleIntakePose), new Point(scorePose2)))
+                .setLinearHeadingInterpolation(rightSampleIntakePose.getHeading(), scorePose2.getHeading())
                 .build();
 
         prePickup2 = follower.pathBuilder()
@@ -143,10 +148,15 @@ public class Auto {
                 .setLinearHeadingInterpolation(midSamplePreIntakePose.getHeading(), midSampleIntakePose.getHeading())
                 .build();
 
+        farPickup2 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(midSampleIntakePose), new Point(midSampleIntakePoseFar)))
+                .setLinearHeadingInterpolation(midSampleIntakePose.getHeading(), midSampleIntakePoseFar.getHeading())
+                .build();
+
         /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(midSampleIntakePose), new Point(scorePose)))
-                .setLinearHeadingInterpolation(midSampleIntakePose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(new Point(midSampleIntakePose), new Point(scorePose2)))
+                .setLinearHeadingInterpolation(midSampleIntakePose.getHeading(), scorePose2.getHeading())
                 .build();
 
         prePickup3 = follower.pathBuilder()
@@ -162,13 +172,13 @@ public class Auto {
 
         /* This is our scorePickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(leftSampleIntakePose), new Point(scorePose)))
-                .setLinearHeadingInterpolation(leftSampleIntakePose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(new Point(leftSampleIntakePose), new Point(scorePose2)))
+                .setLinearHeadingInterpolation(leftSampleIntakePose.getHeading(), scorePose2.getHeading())
                 .build();
 
         /* This is our park path. We are using a BezierCurve with 3 points, which is a curved line that is curved based off of the control point */
-        park = new Path(new BezierCurve(new Point(scorePose), /* Control Point */ new Point(parkControlPose), new Point(parkPose)));
-        park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
+        park = new Path(new BezierCurve(new Point(scorePose2), /* Control Point */ new Point(parkControlPose), new Point(parkPose)));
+        park.setLinearHeadingInterpolation(scorePose2.getHeading(), parkPose.getHeading());
     }
 
     public void preScore() {
@@ -216,7 +226,7 @@ public class Auto {
                 setDumpState(2);
                 break;
             case 2:
-                if (dumpTimer.getElapsedTimeSeconds() > 1) {
+                if (dumpTimer.getElapsedTimeSeconds() > 1) { //change from 1.0 on 1/23
                     actionBusy = false;
                     setDumpState(-1);
                 }
@@ -275,27 +285,23 @@ public class Auto {
                 lift.toTransfer();
                 intake.wristIn();
                 extend.toIn();
-                transferTimer.resetTimer();
                 setTransferState(2);
                 break;
             case 2:
-                if (transferTimer.getElapsedTimeSeconds() > 1.25) {
+                if (transferTimer.getElapsedTimeSeconds() > 1.25) { //changed from 1.25 on 1/23
                     intake.spinOut();
-                    transferTimer.resetTimer();
                     setTransferState(3);
                 }
                 break;
             case 3:
                 if (transferTimer.getElapsedTimeSeconds() > 1) {
                     lift.toHighBasket();
-                    transferTimer.resetTimer();
                     setTransferState(4);
                 }
                 break;
             case 4:
                 if (transferTimer.getElapsedTimeSeconds() > 0.3) {
                     bucket.toMid();
-                    transferTimer.resetTimer();
                     setTransferState(5);
                 }
             case 5:
@@ -310,6 +316,8 @@ public class Auto {
 
     public void setTransferState(int x) {
         transferState = x;
+        transferTimer.resetTimer();
+
     }
 
     public void startTransfer() {
@@ -341,7 +349,7 @@ public class Auto {
                 }
                 break;
             case 3:
-                if (intakeTimer.getElapsedTimeSeconds() > 1) {
+                if (intakeTimer.getElapsedTimeSeconds() > 0.5) {
                     //intake.pivotGround();
                     intake.spinIn();
                     intakeTimer.resetTimer();
@@ -349,7 +357,7 @@ public class Auto {
                 }
                 break;
             case 4:
-                if (intakeTimer.getElapsedTimeSeconds() > 1.5) {
+                if (intakeTimer.getElapsedTimeSeconds() > 1) {
                     intake.spinStop();
                     intakeTimer.resetTimer();
                     actionBusy = false;
@@ -415,9 +423,6 @@ public class Auto {
     }
 
 
-//    public void setActionBusy(boolean x){
-//        actionBusy = x;
-//    }
     public boolean actionNotBusy() {
         return !actionBusy;
     }

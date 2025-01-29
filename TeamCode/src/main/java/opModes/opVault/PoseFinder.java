@@ -1,4 +1,4 @@
-package opModes;
+package opModes.opVault;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.util.Constants;
@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 import runModes.Auto;
-
 @Disabled
 @Autonomous(name = "Pose Finder", group = "Examples")
 public class PoseFinder extends OpMode {
