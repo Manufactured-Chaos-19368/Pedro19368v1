@@ -47,7 +47,7 @@ public class CompAuto extends OpMode {
     public void loop() { // These loop the movements of the robot
         auto.update();
         autonomousPathUpdate();
-
+//
 //        if (auto.intakeTouchState()) {
 //            if(pathState == 3) {
 //                auto.follower.breakFollowing();
