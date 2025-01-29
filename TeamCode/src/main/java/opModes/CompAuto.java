@@ -143,6 +143,7 @@ public class CompAuto extends OpMode {
                 }
                 break;
 
+                ///********* Moves to sample, if touch reads true skip case 51 and go to case 7 *********\\\
             case 6: // MOVE INTO THE SECOND SAMPLE AND GRAB IT.
                 if(!auto.follower.isBusy() && auto.actionNotBusy()) {
                     auto.follower.setMaxPower(slowSpeed);
